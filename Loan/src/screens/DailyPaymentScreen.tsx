@@ -6,8 +6,12 @@ import {
   ScrollView,
   StyleSheet,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
+import { colors, spacing, radius, shadow, typography } from '../theme/theme';
+import SuccessOverlay from '../components/SuccessOverlay';
+import AnimatedButton from '../components/AnimatedButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'DailyPayment'>;
 
@@ -19,6 +23,7 @@ interface UpcomingPayment {
 
 const DailyPaymentScreen = ({ navigation }: Props) => {
   const [isPending, setIsPending] = useState(true);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const todayAmount = 50;
   const totalDeposited = 250;
@@ -26,45 +31,54 @@ const DailyPaymentScreen = ({ navigation }: Props) => {
   const upcomingPayments: UpcomingPayment[] = [
     { label: 'Today', amount: 50, isToday: true },
     { label: '22 Sep', amount: 50 },
-    { label: 'Today', amount: 50 },
-    { label: 'Today', amount: 50 },
-    { label: 'Today', amount: 50 },
+    { label: '23 Sep', amount: 50 },
+    { label: '24 Sep', amount: 50 },
+    { label: '25 Sep', amount: 50 },
   ];
 
   const handlePayNow = () => {
-    // Wire up real payment logic here later
+    if(!isPending) return;
     setIsPending(false);
-    navigation.navigate('RDDepositHistory');
+    setShowSuccess(true);
   };
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      {/* Today's Payment Card */}
-      <View style={styles.paymentCard}>
+    <View style={styles.screen}>
+        <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+      <View style={[styles.paymentCard, shadow.card]}>
         <View style={styles.paymentCardHeader}>
           <View>
             <Text style={styles.paymentCardTitle}>Today's RD Payment</Text>
             <Text style={styles.paymentAmount}>₹{todayAmount}</Text>
-            <Text
-              style={[
-                styles.statusText,
-                { color: isPending ? '#d84315' : '#2e7d32' },
-              ]}
-            >
-              {isPending ? 'Pending' : 'Paid'}
-            </Text>
+            <View style={styles.statusPill}>
+              <Icon
+                name={isPending ? 'schedule' : 'check-circle'}
+                size={13}
+                color={isPending ? colors.danger : colors.primary}
+              />
+              <Text
+                style={[
+                  styles.statusText,
+                  { color: isPending ? colors.danger : colors.primary },
+                ]}
+              >
+                {isPending ? 'Pending' : 'Paid'}
+              </Text>
+            </View>
           </View>
-          <Text style={styles.clockIcon}>⏰</Text>
+          <View style={styles.clockBadge}>
+            <Icon name="access-time" size={26} color={colors.primary} />
+          </View>
         </View>
 
-        <Text style={styles.deadlineText}>⏱ Pay before 8:00 PM</Text>
+        <View style={styles.deadlineRow}>
+          <Icon name="timer" size={14} color={colors.textSecondary} />
+          <Text style={styles.deadlineText}>Pay before 8:00 PM</Text>
+        </View>
 
-        <TouchableOpacity style={styles.payNowButton} onPress={handlePayNow}>
-          <Text style={styles.payNowButtonText}>Pay Now</Text>
-        </TouchableOpacity>
+        <AnimatedButton title="Pay Now" onPress={handlePayNow} />
       </View>
 
-      {/* Upcoming Payments */}
       <Text style={styles.sectionTitle}>Upcoming Payments</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {upcomingPayments.map((payment, index) => (
@@ -72,78 +86,130 @@ const DailyPaymentScreen = ({ navigation }: Props) => {
             key={index}
             style={[
               styles.upcomingChip,
+              shadow.card,
               payment.isToday && styles.upcomingChipToday,
             ]}
           >
-            <Text style={styles.upcomingLabel}>{payment.label}</Text>
+            <Text
+              style={[
+                styles.upcomingLabel,
+                payment.isToday && { color: colors.primaryDark },
+              ]}
+            >
+              {payment.label}
+            </Text>
             <Text style={styles.upcomingAmount}>₹{payment.amount}</Text>
           </View>
         ))}
       </ScrollView>
 
-      {/* Total Deposited */}
-      <View style={styles.totalRow}>
-        <Text style={styles.totalIcon}>📊</Text>
+      <View style={[styles.totalCard, shadow.card]}>
+        <View style={styles.totalIconBadge}>
+          <Icon name="bar-chart" size={22} color={colors.primary} />
+        </View>
         <View>
           <Text style={styles.totalLabel}>Total Deposited</Text>
           <Text style={styles.totalValue}>₹{totalDeposited}</Text>
         </View>
       </View>
-    </ScrollView>
+      </ScrollView>
+      <SuccessOverlay
+        visible={showSuccess}
+        message="Payment Successful!"
+        onDone={() => {
+          setShowSuccess(false);
+          navigation.navigate('RDDepositHistory');
+        }}
+      />
+     </View>  
   );
 };
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#fff' },
-  content: { padding: 16, paddingBottom: 40 },
+  screen: { flex: 1, backgroundColor: colors.background },
+  content: { padding: spacing.md, paddingBottom: 40 },
   paymentCard: {
-    backgroundColor: '#f5f7f5',
-    borderRadius: 12,
-    padding: 18,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    padding: spacing.lg,
   },
   paymentCardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
-  paymentCardTitle: { fontSize: 13, color: '#555', marginBottom: 4 },
-  paymentAmount: { fontSize: 26, fontWeight: '700', color: '#222' },
-  statusText: { fontSize: 12, fontWeight: '600', marginTop: 4 },
-  clockIcon: { fontSize: 26 },
-  deadlineText: { fontSize: 12, color: '#666', marginTop: 14, marginBottom: 14 },
-  payNowButton: {
-    backgroundColor: '#2e7d32',
-    borderRadius: 8,
-    paddingVertical: 14,
+  paymentCardTitle: { ...typography.label, marginBottom: 4 },
+  paymentAmount: { fontSize: 28, fontWeight: '800', color: colors.textPrimary },
+  statusPill: { flexDirection: 'row', alignItems: 'center', marginTop: 6 },
+  statusText: { fontSize: 12, fontWeight: '700', marginLeft: 4 },
+  clockBadge: {
+    width: 48,
+    height: 48,
+    borderRadius: radius.sm,
+    backgroundColor: colors.primarySurface,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  payNowButtonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
-  sectionTitle: {
-    fontSize: 14,
+  deadlineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.md,
+    marginBottom: spacing.md,
+  },
+  deadlineText: { ...typography.body, fontSize: 12, marginLeft: 6 },
+  payNowButton: {
+    flexDirection: 'row',
+    backgroundColor: colors.primary,
+    borderRadius: radius.sm,
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  payNowButtonText: {
+    color: colors.white,
     fontWeight: '700',
-    marginTop: 24,
-    marginBottom: 12,
-    color: '#222',
+    fontSize: 16,
+    marginRight: 8,
+  },
+  sectionTitle: {
+    ...typography.h3,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
   },
   upcomingChip: {
-    backgroundColor: '#f5f7f5',
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+    backgroundColor: colors.surface,
+    borderRadius: radius.sm,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     marginRight: 10,
     alignItems: 'center',
   },
-  upcomingChipToday: { backgroundColor: '#e8f5e9' },
-  upcomingLabel: { fontSize: 11, color: '#666', marginBottom: 4 },
-  upcomingAmount: { fontSize: 13, fontWeight: '700', color: '#222' },
-  totalRow: {
+  upcomingChipToday: { backgroundColor: colors.primarySurface },
+  upcomingLabel: { ...typography.caption, marginBottom: 4 },
+  upcomingAmount: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.textPrimary,
+  },
+  totalCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 24,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginTop: spacing.lg,
   },
-  totalIcon: { fontSize: 20, marginRight: 10 },
-  totalLabel: { fontSize: 12, color: '#666' },
-  totalValue: { fontSize: 16, fontWeight: '700', color: '#222' },
+  totalIconBadge: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.sm,
+    backgroundColor: colors.primarySurface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.sm,
+  },
+  totalLabel: { ...typography.label },
+  totalValue: { ...typography.h3, fontSize: 17, marginTop: 2 },
 });
 
 export default DailyPaymentScreen;

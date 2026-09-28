@@ -8,12 +8,37 @@ import {
   StyleSheet,
   Switch,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
+import { colors, spacing, radius, shadow, typography } from '../theme/theme';
+import AnimatedButton from '../components/AnimatedButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LoanApplication'>;
 
-const LoanApplicationScreen = ({ navigation }: Props) => {
+const SectionCard = ({
+  icon,
+  title,
+  children,
+}: {
+  icon: string;
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <View style={[styles.sectionCard, shadow.card]}>
+    <View style={styles.sectionHeader}>
+      <View style={styles.sectionIconBadge}>
+        <Icon name={icon} size={18} color={colors.primary} />
+      </View>
+      <Text style={styles.sectionTitle}>{title}</Text>
+    </View>
+    {children}
+  </View>
+);
+
+const LoanApplicationScreen = ({ navigation, route }: Props) => {
+  const { flowType } = route.params;
+
   // Personal Details
   const [fullName, setFullName] = useState('');
   const [dob, setDob] = useState('');
@@ -49,290 +74,335 @@ const LoanApplicationScreen = ({ navigation }: Props) => {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      {/* Personal Details */}
-      <Text style={styles.sectionTitle}>Personal Details</Text>
-
-      <Text style={styles.label}>Full Name</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your full name"
-        value={fullName}
-        onChangeText={setFullName}
-      />
-
-      <View style={styles.row}>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>DOB</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Select date"
-            value={dob}
-            onChangeText={setDob}
-          />
-        </View>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>Gender</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Select Gender"
-            value={gender}
-            onChangeText={setGender}
-          />
-        </View>
-      </View>
-
-      <Text style={styles.label}>Mobile Number</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your mobile number"
-        keyboardType="phone-pad"
-        value={mobileNumber}
-        onChangeText={setMobileNumber}
-      />
-
-      <Text style={styles.label}>Marital Status</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Marital Status"
-        value={maritalStatus}
-        onChangeText={setMaritalStatus}
-      />
-
-      {/* Address Details */}
-      <Text style={styles.sectionTitle}>Address Details</Text>
-
-      <View style={styles.row}>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>House Number</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter number"
-            value={houseNumber}
-            onChangeText={setHouseNumber}
-          />
-        </View>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>Area</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter area"
-            value={area}
-            onChangeText={setArea}
-          />
-        </View>
-      </View>
-
-      <View style={styles.row}>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>City</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter city"
-            value={city}
-            onChangeText={setCity}
-          />
-        </View>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>State</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Select state"
-            value={state}
-            onChangeText={setState}
-          />
-        </View>
-      </View>
-
-      <View style={styles.row}>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>PIN Code</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter 6 digit pin code"
-            keyboardType="number-pad"
-            value={pinCode}
-            onChangeText={setPinCode}
-          />
-        </View>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>Residence Type</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Select type"
-            value={residenceType}
-            onChangeText={setResidenceType}
-          />
-        </View>
-      </View>
-
-      {/* Loan Details */}
-      <Text style={styles.sectionTitle}>Loan Details</Text>
-
-      <Text style={styles.label}>Loan Amount</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="₹ 10,000"
-        keyboardType="number-pad"
-        value={loanAmount}
-        onChangeText={setLoanAmount}
-      />
-
-      <View style={styles.row}>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>Loan Purpose</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Select purpose"
-            value={loanPurpose}
-            onChangeText={setLoanPurpose}
-          />
-        </View>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>Monthly Income</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter income"
-            keyboardType="number-pad"
-            value={monthlyIncomeLoan}
-            onChangeText={setMonthlyIncomeLoan}
-          />
-        </View>
-      </View>
-
-      <View style={styles.row}>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>Repayment Duration</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Select duration"
-            value={repaymentDuration}
-            onChangeText={setRepaymentDuration}
-          />
-        </View>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>Loan Year</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Select Year"
-            value={loanYear}
-            onChangeText={setLoanYear}
-          />
-        </View>
-      </View>
-
-      {/* Employment */}
-      <Text style={styles.sectionTitle}>Employment</Text>
-
-      <View style={styles.row}>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>Employment Type</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Select type"
-            value={employmentType}
-            onChangeText={setEmploymentType}
-          />
-        </View>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>Company/Business Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter name"
-            value={companyName}
-            onChangeText={setCompanyName}
-          />
-        </View>
-      </View>
-
-      <View style={styles.row}>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>Monthly Income</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter income"
-            keyboardType="number-pad"
-            value={monthlyIncome}
-            onChangeText={setMonthlyIncome}
-          />
-        </View>
-        <View style={styles.halfField}>
-          <Text style={styles.label}>Monthly Expenses</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter expenses"
-            keyboardType="number-pad"
-            value={monthlyExpenses}
-            onChangeText={setMonthlyExpenses}
-          />
-        </View>
-      </View>
-
-      <View style={styles.switchRow}>
-        <Text style={styles.label}>Existing Loan/EMI</Text>
-        <Switch value={hasExistingLoan} onValueChange={setHasExistingLoan} />
-      </View>
-
-      {/* KYC & ID Verification */}
-      <Text style={styles.sectionTitle}>KYC & ID Verification</Text>
-
-      <Text style={styles.label}>Aadhaar Number</Text>
-      <View style={styles.verifyRow}>
+      <SectionCard icon="person" title="Personal Details">
+        <Text style={styles.label}>Full Name</Text>
         <TextInput
-          style={[styles.input, styles.verifyInput]}
-          placeholder="XXXX-XXXX-XXXX"
+          style={styles.input}
+          placeholder="Enter your full name"
+          placeholderTextColor={colors.textMuted}
+          value={fullName}
+          onChangeText={setFullName}
+        />
+
+        <View style={styles.row}>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>DOB</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Select date"
+              placeholderTextColor={colors.textMuted}
+              value={dob}
+              onChangeText={setDob}
+            />
+          </View>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>Gender</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Select Gender"
+              placeholderTextColor={colors.textMuted}
+              value={gender}
+              onChangeText={setGender}
+            />
+          </View>
+        </View>
+
+        <Text style={styles.label}>Mobile Number</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your mobile number"
+          placeholderTextColor={colors.textMuted}
+          keyboardType="phone-pad"
+          value={mobileNumber}
+          onChangeText={setMobileNumber}
+        />
+
+        <Text style={styles.label}>Marital Status</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Marital Status"
+          placeholderTextColor={colors.textMuted}
+          value={maritalStatus}
+          onChangeText={setMaritalStatus}
+        />
+      </SectionCard>
+
+      <SectionCard icon="home" title="Address Details">
+        <View style={styles.row}>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>House Number</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter number"
+              placeholderTextColor={colors.textMuted}
+              value={houseNumber}
+              onChangeText={setHouseNumber}
+            />
+          </View>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>Area</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter area"
+              placeholderTextColor={colors.textMuted}
+              value={area}
+              onChangeText={setArea}
+            />
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>City</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter city"
+              placeholderTextColor={colors.textMuted}
+              value={city}
+              onChangeText={setCity}
+            />
+          </View>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>State</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Select state"
+              placeholderTextColor={colors.textMuted}
+              value={state}
+              onChangeText={setState}
+            />
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>PIN Code</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="6 digit pin code"
+              placeholderTextColor={colors.textMuted}
+              keyboardType="number-pad"
+              value={pinCode}
+              onChangeText={setPinCode}
+            />
+          </View>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>Residence Type</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Select type"
+              placeholderTextColor={colors.textMuted}
+              value={residenceType}
+              onChangeText={setResidenceType}
+            />
+          </View>
+        </View>
+      </SectionCard>
+
+      <SectionCard icon="account-balance-wallet" title="Loan Details">
+        <Text style={styles.label}>Loan Amount</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="₹ 10,000"
+          placeholderTextColor={colors.textMuted}
           keyboardType="number-pad"
-          value={aadhaarNumber}
-          onChangeText={setAadhaarNumber}
+          value={loanAmount}
+          onChangeText={setLoanAmount}
         />
-        <TouchableOpacity style={styles.verifyButton}>
-          <Text style={styles.verifyButtonText}>Verify</Text>
-        </TouchableOpacity>
-      </View>
 
-      <Text style={styles.label}>PAN Number</Text>
-      <View style={styles.verifyRow}>
-        <TextInput
-          style={[styles.input, styles.verifyInput]}
-          placeholder="ABCDE1234F"
-          autoCapitalize="characters"
-          value={panNumber}
-          onChangeText={setPanNumber}
-        />
-        <TouchableOpacity style={styles.verifyButton}>
-          <Text style={styles.verifyButtonText}>Verify</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.row}>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>Loan Purpose</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Select purpose"
+              placeholderTextColor={colors.textMuted}
+              value={loanPurpose}
+              onChangeText={setLoanPurpose}
+            />
+          </View>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>Monthly Income</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter income"
+              placeholderTextColor={colors.textMuted}
+              keyboardType="number-pad"
+              value={monthlyIncomeLoan}
+              onChangeText={setMonthlyIncomeLoan}
+            />
+          </View>
+        </View>
 
-      {/* Continue Button */}
-      <TouchableOpacity
-        style={styles.continueButton}
-        onPress={() => navigation.navigate('RecurringDeposit')}
-      >
-        <Text style={styles.continueButtonText}>Continue</Text>
-      </TouchableOpacity>
+        <View style={styles.row}>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>Repayment Duration</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Select duration"
+              placeholderTextColor={colors.textMuted}
+              value={repaymentDuration}
+              onChangeText={setRepaymentDuration}
+            />
+          </View>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>Loan Year</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Select Year"
+              placeholderTextColor={colors.textMuted}
+              value={loanYear}
+              onChangeText={setLoanYear}
+            />
+          </View>
+        </View>
+      </SectionCard>
+
+      <SectionCard icon="work" title="Employment">
+        <View style={styles.row}>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>Employment Type</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Select type"
+              placeholderTextColor={colors.textMuted}
+              value={employmentType}
+              onChangeText={setEmploymentType}
+            />
+          </View>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>Company/Business</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter name"
+              placeholderTextColor={colors.textMuted}
+              value={companyName}
+              onChangeText={setCompanyName}
+            />
+          </View>
+        </View>
+
+        <View style={styles.row}>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>Monthly Income</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter income"
+              placeholderTextColor={colors.textMuted}
+              keyboardType="number-pad"
+              value={monthlyIncome}
+              onChangeText={setMonthlyIncome}
+            />
+          </View>
+          <View style={styles.halfField}>
+            <Text style={styles.label}>Monthly Expenses</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter expenses"
+              placeholderTextColor={colors.textMuted}
+              keyboardType="number-pad"
+              value={monthlyExpenses}
+              onChangeText={setMonthlyExpenses}
+            />
+          </View>
+        </View>
+
+        <View style={styles.switchRow}>
+          <Text style={styles.label}>Existing Loan / EMI</Text>
+          <Switch
+            value={hasExistingLoan}
+            onValueChange={setHasExistingLoan}
+            trackColor={{ false: '#ddd', true: colors.primaryLight }}
+            thumbColor={colors.white}
+          />
+        </View>
+      </SectionCard>
+
+      <SectionCard icon="verified-user" title="KYC & ID Verification">
+        <Text style={styles.label}>Aadhaar Number</Text>
+        <View style={styles.verifyRow}>
+          <TextInput
+            style={[styles.input, styles.verifyInput]}
+            placeholder="XXXX-XXXX-XXXX"
+            placeholderTextColor={colors.textMuted}
+            keyboardType="number-pad"
+            value={aadhaarNumber}
+            onChangeText={setAadhaarNumber}
+          />
+          <TouchableOpacity style={styles.verifyButton}>
+            <Icon
+              name="check-circle-outline"
+              size={15}
+              color={colors.primary}
+            />
+            <Text style={styles.verifyButtonText}>Verify</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.label}>PAN Number</Text>
+        <View style={styles.verifyRow}>
+          <TextInput
+            style={[styles.input, styles.verifyInput]}
+            placeholder="ABCDE1234F"
+            placeholderTextColor={colors.textMuted}
+            autoCapitalize="characters"
+            value={panNumber}
+            onChangeText={setPanNumber}
+          />
+          <TouchableOpacity style={styles.verifyButton}>
+            <Icon
+              name="check-circle-outline"
+              size={15}
+              color={colors.primary}
+            />
+            <Text style={styles.verifyButtonText}>Verify</Text>
+          </TouchableOpacity>
+        </View>
+      </SectionCard>
+
+      <AnimatedButton
+        title="Continue"
+        onPress={() => navigation.navigate('UploadDocuments', { flowType })}
+        style={{ marginTop: spacing.sm }}
+      />
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#fff' },
-  content: { padding: 16, paddingBottom: 40 },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginTop: 20,
-    marginBottom: 10,
-    color: '#333',
+  screen: { flex: 1, backgroundColor: colors.background },
+  content: { padding: spacing.md, paddingBottom: 40 },
+  sectionCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
   },
-  label: { fontSize: 12, color: '#555', marginBottom: 4, marginTop: 8 },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  sectionIconBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.sm,
+    backgroundColor: colors.primarySurface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  sectionTitle: { ...typography.h3 },
+  label: { ...typography.label, marginBottom: 6, marginTop: spacing.sm },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 11,
     fontSize: 14,
-    backgroundColor: '#fafafa',
+    color: colors.textPrimary,
+    backgroundColor: colors.background,
   },
   row: { flexDirection: 'row', justifyContent: 'space-between' },
   halfField: { width: '48%' },
@@ -340,25 +410,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: spacing.sm,
   },
   verifyRow: { flexDirection: 'row', alignItems: 'center' },
   verifyInput: { flex: 1, marginRight: 8 },
   verifyButton: {
-    backgroundColor: '#e8f5e9',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  verifyButtonText: { color: '#2e7d32', fontWeight: '600' },
-  continueButton: {
-    backgroundColor: '#2e7d32',
-    borderRadius: 8,
-    paddingVertical: 14,
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 24,
+    backgroundColor: colors.primarySurface,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    borderRadius: radius.sm,
   },
-  continueButtonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  verifyButtonText: {
+    color: colors.primary,
+    fontWeight: '700',
+    marginLeft: 4,
+    fontSize: 12,
+  },
+  continueButton: {
+    flexDirection: 'row',
+    backgroundColor: colors.primary,
+    borderRadius: radius.sm,
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: spacing.sm,
+  },
+  continueButtonText: {
+    color: colors.white,
+    fontWeight: '700',
+    fontSize: 16,
+    marginRight: 8,
+  },
 });
 
 export default LoanApplicationScreen;

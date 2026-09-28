@@ -7,14 +7,19 @@ import {
   StyleSheet,
   Animated,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
+import { colors, spacing, radius, shadow, typography } from '../theme/theme';
+import AnimatedButton from '../components/AnimatedButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 const LoginScreen = ({ navigation }: Props) => {
   const [emailOrMobile, setEmailOrMobile] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
@@ -39,45 +44,84 @@ const LoginScreen = ({ navigation }: Props) => {
     transform: [{ translateY: slideAnim }],
   };
 
-  const handleLogin = () => {
-    // Wire up real auth logic here later
-    navigation.navigate('LoanApplication');
-  };
+ const handleLogin = () => {
+  setLoading(true);
+  setTimeout(() => {
+    setLoading(false);
+    navigation.navigate('ChooseLoanType');
+  }, 800);
+};
 
   return (
     <View style={styles.screen}>
       <Animated.View style={animatedStyle}>
+        <View style={[styles.logoBadge, shadow.card]}>
+          <Icon
+            name="account-balance-wallet"
+            size={30}
+            color={colors.primary}
+          />
+        </View>
+
         <Text style={styles.title}>Welcome Back</Text>
         <Text style={styles.subtitle}>Log in to continue</Text>
 
         <Text style={styles.label}>Email or Mobile Number</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter email or mobile number"
-          value={emailOrMobile}
-          onChangeText={setEmailOrMobile}
-          autoCapitalize="none"
-        />
+        <View style={styles.inputWrap}>
+          <Icon
+            name="person-outline"
+            size={18}
+            color={colors.textMuted}
+            style={styles.inputIcon}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Enter email or mobile number"
+            placeholderTextColor={colors.textMuted}
+            value={emailOrMobile}
+            onChangeText={setEmailOrMobile}
+            autoCapitalize="none"
+          />
+        </View>
 
         <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+        <View style={styles.inputWrap}>
+          <Icon
+            name="lock-outline"
+            size={18}
+            color={colors.textMuted}
+            style={styles.inputIcon}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your password"
+            placeholderTextColor={colors.textMuted}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Icon
+              name={showPassword ? 'visibility-off' : 'visibility'}
+              size={18}
+              color={colors.textMuted}
+            />
+          </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Log In</Text>
-        </TouchableOpacity>
+        <AnimatedButton
+          title="Log In"
+          onPress={handleLogin}
+          style={{ marginTop: spacing.xl }}
+        />
 
         <TouchableOpacity
           style={styles.linkRow}
           onPress={() => navigation.navigate('Signup')}
         >
           <Text style={styles.linkText}>
-            Don't have an account? <Text style={styles.linkTextBold}>Sign Up</Text>
+            Don't have an account?{' '}
+            <Text style={styles.linkTextBold}>Sign Up</Text>
           </Text>
         </TouchableOpacity>
       </Animated.View>
@@ -86,30 +130,58 @@ const LoginScreen = ({ navigation }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#fff', padding: 24, paddingTop: 40 },
-  title: { fontSize: 24, fontWeight: '700', color: '#222', marginBottom: 4 },
-  subtitle: { fontSize: 14, color: '#666', marginBottom: 28 },
-  label: { fontSize: 12, color: '#555', marginBottom: 6, marginTop: 14 },
-  input: {
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+    padding: spacing.lg,
+    paddingTop: 60,
+  },
+  logoBadge: {
+    width: 64,
+    height: 64,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+  },
+  title: { ...typography.h1, marginBottom: 4 },
+  subtitle: { ...typography.body, marginBottom: spacing.xl },
+  label: { ...typography.label, marginBottom: 6, marginTop: spacing.md },
+  inputWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
     paddingHorizontal: 12,
-    paddingVertical: 12,
+    backgroundColor: colors.surface,
+  },
+  inputIcon: { marginRight: 8 },
+  input: {
+    flex: 1,
+    paddingVertical: 13,
     fontSize: 14,
-    backgroundColor: '#fafafa',
+    color: colors.textPrimary,
   },
   loginButton: {
-    backgroundColor: '#2e7d32',
-    borderRadius: 8,
-    paddingVertical: 14,
+    flexDirection: 'row',
+    backgroundColor: colors.primary,
+    borderRadius: radius.sm,
+    paddingVertical: 15,
     alignItems: 'center',
-    marginTop: 28,
+    justifyContent: 'center',
+    marginTop: spacing.xl,
   },
-  loginButtonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
-  linkRow: { marginTop: 20, alignItems: 'center' },
-  linkText: { fontSize: 13, color: '#666' },
-  linkTextBold: { color: '#2e7d32', fontWeight: '700' },
+  loginButtonText: {
+    color: colors.white,
+    fontWeight: '700',
+    fontSize: 16,
+    marginRight: 8,
+  },
+  linkRow: { marginTop: spacing.lg, alignItems: 'center' },
+  linkText: { fontSize: 13, color: colors.textSecondary },
+  linkTextBold: { color: colors.primary, fontWeight: '700' },
 });
 
 export default LoginScreen;

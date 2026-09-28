@@ -1,14 +1,22 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
+import { colors, spacing, radius, shadow, typography } from '../theme/theme';
+import AnimatedButton from '../components/AnimatedButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RecurringDeposit'>;
 
-const RecurringDepositScreen = ({ navigation }: Props) => {
-  // Static for now — Step 8 will wire this up to pass real data between screens
-  const loanAmount = 8000;
-  const dailyRDDeposit = 50;
+const RecurringDepositScreen = ({ navigation, route }: Props) => {
+  const loanAmount = route.params?.loanAmount ?? 8000;
+  const dailyRDDeposit = Math.round(loanAmount / 160);
 
   const steps = [
     'A fixed amount will be deposited daily in your RD.',
@@ -18,10 +26,20 @@ const RecurringDepositScreen = ({ navigation }: Props) => {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      {/* Loan Amount Card */}
-      <View style={styles.card}>
+      <View style={[styles.card, shadow.card]}>
         <View style={styles.cardLeft}>
-          <Text style={styles.iconCircle}>💰</Text>
+          <View
+            style={[
+              styles.iconBadge,
+              { backgroundColor: colors.primarySurface },
+            ]}
+          >
+            <Icon
+              name="account-balance-wallet"
+              size={22}
+              color={colors.primary}
+            />
+          </View>
           <View>
             <Text style={styles.cardLabel}>Your Loan Amount</Text>
             <Text style={styles.cardValue}>₹{loanAmount.toLocaleString()}</Text>
@@ -35,11 +53,12 @@ const RecurringDepositScreen = ({ navigation }: Props) => {
         </TouchableOpacity>
       </View>
 
-      {/* RD Deposit Card */}
-      <View style={styles.card}>
+      <View style={[styles.card, shadow.card]}>
         <View style={styles.cardLeft}>
-          <Text style={styles.iconCircle}>🐷</Text>
-          <View>
+          <View style={[styles.iconBadge, { backgroundColor: '#fff3e0' }]}>
+            <Icon name="savings" size={22} color={colors.accent} />
+          </View>
+          <View style={{ flex: 1 }}>
             <Text style={styles.cardLabel}>Required Daily RD Deposit</Text>
             <Text style={styles.cardValue}>₹{dailyRDDeposit} / day</Text>
             <Text style={styles.cardSubtext}>
@@ -49,78 +68,92 @@ const RecurringDepositScreen = ({ navigation }: Props) => {
         </View>
       </View>
 
-      {/* How it works */}
       <Text style={styles.sectionTitle}>How it works?</Text>
-      {steps.map((step, index) => (
-        <View key={index} style={styles.stepRow}>
-          <View style={styles.stepNumberCircle}>
-            <Text style={styles.stepNumberText}>{index + 1}</Text>
+      <View style={[styles.stepsCard, shadow.card]}>
+        {steps.map((step, index) => (
+          <View
+            key={index}
+            style={[
+              styles.stepRow,
+              index === steps.length - 1 && { marginBottom: 0 },
+            ]}
+          >
+            <View style={styles.stepNumberCircle}>
+              <Text style={styles.stepNumberText}>{index + 1}</Text>
+            </View>
+            <Text style={styles.stepText}>{step}</Text>
           </View>
-          <Text style={styles.stepText}>{step}</Text>
-        </View>
-      ))}
+        ))}
+      </View>
 
-      <TouchableOpacity
-        style={styles.createButton}
-        onPress={() => navigation.navigate('LoanRDDetails')}
-      >
-        <Text style={styles.createButtonText}>Create RD</Text>
-      </TouchableOpacity>
+      <View style={{ marginTop: 'auto', paddingTop: spacing.md }}>
+        <AnimatedButton
+          title="Create RD"
+          icon="savings"
+          onPress={() => navigation.navigate('LoanRDDetails')}
+        />
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#fff' },
-  content: { padding: 16, paddingBottom: 40, flexGrow: 1 },
+  screen: { flex: 1, backgroundColor: colors.background },
+  content: { padding: spacing.md, paddingBottom: 40, flexGrow: 1 },
   card: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#f5f7f5',
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 14,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
   },
   cardLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
-  iconCircle: { fontSize: 22, marginRight: 12 },
-  cardLabel: { fontSize: 12, color: '#666' },
-  cardValue: { fontSize: 16, fontWeight: '700', color: '#222', marginTop: 2 },
-  cardSubtext: { fontSize: 11, color: '#888', marginTop: 2 },
+  iconBadge: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.sm,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: spacing.sm,
+  },
+  cardLabel: { ...typography.label, marginBottom: 2 },
+  cardValue: { ...typography.h3, fontSize: 17 },
+  cardSubtext: { ...typography.caption, marginTop: 2 },
   editButton: {
-    backgroundColor: '#2e7d32',
-    borderRadius: 6,
+    backgroundColor: colors.primary,
+    borderRadius: radius.sm,
     paddingHorizontal: 14,
-    paddingVertical: 6,
+    paddingVertical: 7,
   },
-  editButtonText: { color: '#fff', fontSize: 12, fontWeight: '600' },
+  editButtonText: { color: colors.white, fontSize: 12, fontWeight: '700' },
   sectionTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    marginTop: 20,
-    marginBottom: 14,
-    color: '#222',
+    ...typography.h3,
+    marginTop: spacing.sm,
+    marginBottom: spacing.sm,
   },
-  stepRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 16 },
+  stepsCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    padding: spacing.md,
+  },
+  stepRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: spacing.md,
+  },
   stepNumberCircle: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: '#2e7d32',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
   },
-  stepNumberText: { color: '#fff', fontSize: 12, fontWeight: '700' },
-  stepText: { flex: 1, fontSize: 13, color: '#444', lineHeight: 18 },
-  createButton: {
-    backgroundColor: '#2e7d32',
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 'auto',
-  },
-  createButtonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  stepNumberText: { color: colors.white, fontSize: 12, fontWeight: '700' },
+  stepText: { flex: 1, ...typography.body, lineHeight: 19 },
 });
 
 export default RecurringDepositScreen;
