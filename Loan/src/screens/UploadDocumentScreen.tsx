@@ -100,13 +100,7 @@ const UploadDocumentsScreen = ({ navigation, route }: Props) => {
       return rest;
     });
 
-  const handleContinue = () => {
-    if (flowType === 'rd') {
-      navigation.navigate('RecurringDeposit', { flowType });
-    } else {
-      navigation.navigate('LoanOffer', { flowType });
-    }
-  };
+  const handleContinue = () => navigation.navigate('BankDetails', { flowType });
 
   return (
     <View style={styles.screen}>

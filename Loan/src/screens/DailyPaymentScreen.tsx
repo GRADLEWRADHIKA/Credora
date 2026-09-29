@@ -12,6 +12,7 @@ import type { RootStackParamList } from '../../App';
 import { colors, spacing, radius, shadow, typography } from '../theme/theme';
 import SuccessOverlay from '../components/SuccessOverlay';
 import AnimatedButton from '../components/AnimatedButton';
+import { haptics } from '../utils/haptics';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'DailyPayment'>;
 
@@ -37,10 +38,11 @@ const DailyPaymentScreen = ({ navigation }: Props) => {
   ];
 
   const handlePayNow = () => {
-    if(!isPending) return;
-    setIsPending(false);
-    setShowSuccess(true);
-  };
+  if (!isPending) return;
+  haptics.success();
+  setIsPending(false);
+  setShowSuccess(true);
+};
 
   return (
     <View style={styles.screen}>

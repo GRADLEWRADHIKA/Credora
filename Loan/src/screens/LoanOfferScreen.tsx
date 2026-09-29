@@ -83,7 +83,7 @@ const LoanOfferScreen = ({ navigation }: Props) => {
         <AnimatedButton
           title="Accept Offer"
           icon="check-circle-outline"
-          onPress={() => navigation.navigate('EMISchedule')}
+          onPress={() => navigation.navigate('LoanAgreement', { flowType: 'standard' })}
         />
       </View>
     </ScrollView>

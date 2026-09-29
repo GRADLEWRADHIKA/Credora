@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { colors, radius, shadow } from '../theme/theme';
+import { haptics } from '../utils/haptics';
 
 interface Props {
   title: string;
@@ -48,7 +49,10 @@ const AnimatedButton = ({
       <Pressable
         onPressIn={() => animateTo(0.96)}
         onPressOut={() => animateTo(1)}
-        onPress={onPress}
+        onPress={() => {
+          haptics.tap();
+          onPress();
+        }}
         disabled={loading}
         style={[
           styles.base,
@@ -58,7 +62,9 @@ const AnimatedButton = ({
         ]}
       >
         {loading ? (
-          <ActivityIndicator color={isPrimary ? colors.white : colors.primary} />
+          <ActivityIndicator
+            color={isPrimary ? colors.white : colors.primary}
+          />
         ) : (
           <>
             <Text
@@ -94,7 +100,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   primary: { backgroundColor: colors.primary },
-  secondary: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: colors.primary },
+  secondary: {
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+  },
   text: { fontWeight: '700', fontSize: 16 },
 });
 

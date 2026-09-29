@@ -90,7 +90,7 @@ const RecurringDepositScreen = ({ navigation, route }: Props) => {
         <AnimatedButton
           title="Create RD"
           icon="savings"
-          onPress={() => navigation.navigate('LoanRDDetails')}
+          onPress={() => navigation.navigate('LoanAgreement', { flowType: 'rd' })}
         />
       </View>
     </ScrollView>
